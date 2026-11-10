@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Clinic portal · Dr. Khalil Chidiac</title>
+  <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="portal.css">
+</head>
+<body>
+  <!-- Lock screen -->
+  <section id="lock" class="lock" hidden>
+    <form id="lock-form" class="lock-card" autocomplete="off">
+      <span class="brand-mark big" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-5 4 10 2-5h8"/></svg>
+      </span>
+      <h1 id="lock-title">Clinic portal</h1>
+      <p id="lock-sub" class="muted"></p>
+      <label class="fld">Passphrase
+        <input id="lock-pass" type="password" required minlength="8" autocomplete="current-password">
+      </label>
+      <label class="fld" id="lock-confirm-wrap" hidden>Confirm passphrase
+        <input id="lock-confirm" type="password" minlength="8" autocomplete="new-password">
+      </label>
+      <button class="btn btn-blue block" type="submit" id="lock-btn">Unlock</button>
+      <p id="lock-err" class="err" role="alert"></p>
+      <p class="tiny muted">Records are encrypted on this device with your passphrase (AES-256). If the passphrase is lost, the data cannot be recovered — keep regular backups.</p>
+    </form>
+  </section>
+
+  <!-- App -->
+  <div id="app" class="shell" hidden>
+    <aside class="side">
+      <div class="side-brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-5 4 10 2-5h8"/></svg>
+        </span>
+        <span>Clinic portal</span>
+      </div>
+      <nav class="side-nav" aria-label="Portal">
+        <a href="#/" data-nav="dash"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Dashboard</a>
+        <a href="#/patients" data-nav="patients"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c1-4 4-6 7-6s6 2 7 6M16 4a4 4 0 0 1 0 8M22 21c-.5-2.5-2-4.3-4-5.2"/></svg>Patients</a>
+        <a href="#/appointments" data-nav="appointments"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>Appointments</a>
+        <a href="#/settings" data-nav="settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>Backup &amp; settings</a>
+      </nav>
+      <div class="side-foot">
+        <div class="me">
+          <span class="avatar light">KC</span>
+          <span><strong>Dr. Khalil Chidiac</strong><small>Gastroenterology</small></span>
+        </div>
+        <button type="button" class="btn btn-ghost-light block" id="lock-now">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Lock</button>
+      </div>
+    </aside>
+    <main id="view" class="main" tabindex="-1"></main>
+  </div>
+
+  <dialog id="modal" class="modal">
+    <form method="dialog" id="modal-form">
+      <div class="modal-head">
+        <h2 id="modal-title"></h2>
+        <button type="button" class="icon-btn" id="modal-x" aria-label="Close">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+      </div>
+      <div id="modal-body" class="modal-body"></div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-danger" id="modal-del" hidden>Delete</button>
+        <span class="grow"></span>
+        <button type="button" class="btn btn-soft" id="modal-cancel">Cancel</button>
+        <button type="submit" class="btn btn-blue" id="modal-ok">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

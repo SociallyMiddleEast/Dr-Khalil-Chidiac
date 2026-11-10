@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dr. Khalil Chidiac, MD · Gastroenterologist &amp; Hepatologist · Bikfaya &amp; Antelias</title>
+  <meta name="description" content="Dr. Khalil Chidiac, MD — gastroenterology and hepatology in Bikfaya and Antelias, Lebanon. Gastroscopy, colonoscopy, intragastric balloon, band ligation, liver and pancreas care.">
+  <meta property="og:title" content="Dr. Khalil Chidiac, MD · Gastroenterologist">
+  <meta property="og:description" content="Gastroenterology and hepatology care in Bikfaya and Antelias, Lebanon.">
+  <meta name="theme-color" content="#1F4FD8">
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/site.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Physician",
+    "name": "Dr. Khalil Chidiac, MD",
+    "medicalSpecialty": ["Gastroenterologic", "Hepatologic"],
+    "knowsLanguage": ["ar", "en", "fr"],
+    "address": [
+      {"@type": "PostalAddress", "streetAddress": "Bikfaya Main Road, Douar", "addressLocality": "Bikfaya", "addressCountry": "LB"},
+      {"@type": "PostalAddress", "streetAddress": "Michel Abou-Jaoude Center, 4th Floor", "addressLocality": "Antelias", "addressCountry": "LB"}
+    ],
+    "sameAs": ["https://www.instagram.com/dr.khalilchidiac/"]
+  }
+  </script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="wrap">
+  <header class="topbar card">
+    <a href="#top" class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h4l2-5 4 10 2-5h8"/></svg>
+      </span>
+      <span class="brand-text">
+        <strong>Dr. Khalil Chidiac</strong>
+        <small>Gastroenterology &amp; Hepatology</small>
+      </span>
+    </a>
+    <button class="menu-btn" type="button" aria-expanded="false" aria-controls="nav" aria-label="Open menu">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    </button>
+    <nav id="nav" class="nav" aria-label="Main">
+      <a href="#services">Services</a>
+      <a href="#about">About</a>
+      <a href="#visit">Your visit</a>
+      <a href="#clinics">Clinics</a>
+      <a href="#book" class="btn btn-dark">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>
+        Book a visit
+      </a>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section id="top" class="row">
+      <div class="hero card-blue">
+        <div class="orb orb-1" aria-hidden="true"></div>
+        <div class="orb orb-2" aria-hidden="true"></div>
+        <div class="orb orb-3" aria-hidden="true">
+          <svg width="86" height="86" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.4-9.3-9A5.2 5.2 0 0 1 12 6.2 5.2 5.2 0 0 1 21.3 12C19 16.6 12 21 12 21z"/><path d="M6 12h3l1.5-2.5 2.5 5 1.5-2.5H18"/></svg>
+        </div>
+        <span class="pill-badge"><span class="dot"></span>Clinics in Bikfaya &amp; Antelias</span>
+        <div class="hero-copy">
+          <h1>Digestive health,<br><em>handled with care.</em></h1>
+          <p>Specialist care for the stomach, intestines, liver and pancreas — from first symptoms to endoscopy and long-term follow-up. Consultations in Arabic, English and French.</p>
+          <div class="actions">
+            <a href="#book" class="btn btn-blue btn-lg">Book an appointment</a>
+            <a href="#services" class="btn btn-white btn-lg">Explore services</a>
+          </div>
+        </div>
+      </div>
+
+      <form id="book" class="card booking" novalidate>
+        <div class="booking-head">
+          <h2>Request a visit</h2>
+          <span id="month-label" class="muted"></span>
+        </div>
+
+        <fieldset class="seg" aria-label="Choose a location">
+          <legend class="label">Where</legend>
+          <div class="seg-row" id="loc-row"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="label">Day</legend>
+          <div class="days" id="days" role="group" aria-label="Choose a day"></div>
+        </fieldset>
+
+        <fieldset>
+          <legend class="label">Preferred time</legend>
+          <div class="slots" id="slots" role="group" aria-label="Choose a time"></div>
+        </fieldset>
+
+        <div class="fields">
+          <label>Your name<input id="b-name" type="text" autocomplete="name" required></label>
+          <label>Phone<input id="b-phone" type="tel" autocomplete="tel" required></label>
+        </div>
+
+        <div class="summary">
+          <div>
+            <span class="muted small">Your request</span>
+            <strong id="summary"></strong>
+          </div>
+          <button type="submit" class="btn btn-blue">Send request</button>
+        </div>
+        <p id="book-msg" class="small muted" role="status"></p>
+      </form>
+    </section>
+
+    <section id="about" class="row">
+      <div class="portrait card-navy">
+        <img src="assets/img/doctor.jpg" alt="Dr. Khalil Chidiac" onerror="this.remove()">
+        <div class="portrait-fallback" aria-hidden="true">KC</div>
+        <div class="portrait-cap">
+          <strong>Dr. Khalil Chidiac, MD</strong>
+          <span>Gastroenterologist &amp; Hepatologist</span>
+        </div>
+      </div>
+
+      <div class="card about">
+        <span class="eyebrow">Meet your doctor</span>
+        <h2>Trained in Beirut and Paris, <em>practising close to home.</em></h2>
+        <p>Dr. Chidiac trained in general and internal medicine and in gastroenterology at the Lebanese University, then completed his gastroenterology residency at Université Paris VII and a university diploma (DIU) in pancreatology at Université Paris V. He has been in practice since 2017 and treats patients at hospitals across Metn and Beirut.</p>
+        <div class="chips">
+          <span>Lebanese University</span>
+          <span>Residency · Université Paris VII</span>
+          <span>DIU Pancreatology · Université Paris V</span>
+          <span>Arabic · English · French</span>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card-blue-solid stat">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 14.4l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8z"/></svg>
+          <div><div class="big">2017</div><div class="sub">in practice since</div></div>
+        </div>
+        <div class="card stat">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F4FD8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9.5l4 2.5-4 2.5z"/></svg>
+          <div><div class="mid">Video visits</div><div class="sub dark">Follow-ups from home</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="card section">
+      <div class="section-head">
+        <h2>How I can <em>help</em></h2>
+        <p class="muted">Not sure what you need? Start with a consultation and we'll decide together whether any tests or procedures are needed.</p>
+      </div>
+      <div class="grid-services">
+        <article class="svc"><span class="svc-ic"><svg viewBox="0 0 24 24"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z"/></svg></span><div><h3>Consultations</h3><p>Heartburn, abdominal pain, bloating, changes in bowel habits, and second opinions.</p></div></article>
+        <article class="svc"><span class="svc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></svg></span><div><h3>Gastroscopy</h3><p>Upper endoscopy to examine the oesophagus, stomach and duodenum.</p></div></article>
+        <article class="svc"><span class="svc-ic"><svg viewBox="0 0 24 24"><path d="M4 6c4 0 4 4 8 4s4-4 8-4M4 12c4 0 4 4 8 4s4-4 8-4M4 18c2 0 3 1 4 2"/></svg></span><div><h3>Colonoscopy</h3><p>Examination of the colon for symptoms, screening and polyp follow-up.</p></div></article>
+        <article class="svc"><span class="svc-ic"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="6" ry="8"/><path d="M12 4v-2"/></svg></span><div><h3>Intragastric balloon</h3><p>Endoscopic, non-surgical weight-loss support with follow-up.</p></div></article>
+        <article class="svc"><span class="svc-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></span><div><h3>Band ligation</h3><p>Endoscopic banding for varices and selected bleeding sources.</p></div></article>
+        <article class="svc"><span class="svc-ic"><svg viewBox="0 0 24 24"><path d="M4 14c0-5 5-9 11-9 3 0 5 2 5 5 0 6-6 9-11 9-3 0-5-2-5-5z"/></svg></span><div><h3>Liver &amp; pancreas</h3><p>Hepatitis, fatty liver, abnormal liver tests and pancreatic disorders.</p></div></article>
+      </div>
+    </section>
+
+    <section id="visit" class="row">
+      <div class="card-blue steps-intro">
+        <span class="eyebrow">Your visit</span>
+        <h2>Three simple steps, <em>zero stress.</em></h2>
+      </div>
+      <div class="card step"><span class="num">01</span><h3>Request a time</h3><p>Use the form above or message the clinic. We'll confirm your appointment.</p></div>
+      <div class="card step"><span class="num">02</span><h3>Talk it through</h3><p>A careful consultation and examination. Bring previous reports, lab results and your list of medicines.</p></div>
+      <div class="card-navy step"><span class="num light">03</span><h3>Leave with a plan</h3><p>Clear next steps — tests, procedure instructions if needed, and an easy way to follow up.</p></div>
+    </section>
+
+    <section class="card section">
+      <div class="section-head">
+        <h2>Hospital <em>affiliations</em></h2>
+        <p class="muted">Procedures and admissions take place at:</p>
+      </div>
+      <ul class="hospitals">
+        <li>Abou Jaoude Hospital</li>
+        <li>Haroun Hospital</li>
+        <li>Lebanese Geitaoui University Hospital</li>
+        <li>Serhal Hospital</li>
+        <li>Bsalim Hospital</li>
+      </ul>
+      <p class="small muted">Member of the Lebanese Order of Physicians and the Lebanese Society of Gastroenterology.</p>
+    </section>
+
+    <section id="clinics" class="row">
+      <div class="card clinic">
+        <div class="map" aria-hidden="true"><i class="r1"></i><i class="r2"></i><i class="r3"></i><i class="r4"></i><span class="pin"><b></b></span></div>
+        <div class="clinic-body">
+          <h3>Bikfaya clinic</h3>
+          <p class="muted">Khalil Chidiac's Clinic · Douar, Bikfaya Main Road</p>
+          <a class="link" href="https://www.google.com/maps/search/?api=1&query=Douar%20Bikfaya%20Main%20Road%20Lebanon" target="_blank" rel="noopener">Open in Maps →</a>
+        </div>
+      </div>
+      <div class="card clinic">
+        <div class="map alt" aria-hidden="true"><i class="r1"></i><i class="r2"></i><i class="r3"></i><i class="r4"></i><span class="pin"><b></b></span></div>
+        <div class="clinic-body">
+          <h3>Antelias clinic</h3>
+          <p class="muted">MC Clinic · Michel Abou-Jaoude Center, 4th Floor</p>
+          <a class="link" href="https://www.google.com/maps/search/?api=1&query=Michel%20Abou%20Jaoude%20Center%20Antelias" target="_blank" rel="noopener">Open in Maps →</a>
+        </div>
+      </div>
+      <div class="card-navy contact">
+        <h2>Let's talk about <em>your health.</em></h2>
+        <div class="contact-links">
+          <a id="c-phone" class="contact-link" href="#"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg><span></span></a>
+          <a class="contact-link" href="https://www.instagram.com/dr.khalilchidiac/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><path d="M17.5 6.5v.01"/></svg><span>@dr.khalilchidiac</span></a>
+          <a href="#book" class="btn btn-white btn-lg block">Book an appointment</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>© <span id="year"></span> Dr. Khalil Chidiac, MD</span>
+    <span>In an emergency, call 140 (Red Cross) or go to the nearest emergency department.</span>
+  </footer>
+</div>
+
+<script src="assets/js/site.js"></script>
+</body>
+</html>
