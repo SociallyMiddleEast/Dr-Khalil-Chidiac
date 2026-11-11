@@ -17,26 +17,64 @@ const STATUSES = [
   ["scheduled", "Scheduled", ""], ["checked-in", "Checked in", "warn"], ["in-room", "In the room", "blue"],
   ["done", "Seen", "ok"], ["no-show", "No-show", "bad"], ["cancelled", "Cancelled", ""]
 ];
-// Typical adult reference ranges — every lab differs; ranges are editable per result.
-const LABS = {
-  "ALT":              { unit: "U/L",     lo: 7,    hi: 56 },
-  "AST":              { unit: "U/L",     lo: 10,   hi: 40 },
-  "ALP":              { unit: "U/L",     lo: 44,   hi: 147 },
-  "GGT":              { unit: "U/L",     lo: 9,    hi: 48 },
-  "Total bilirubin":  { unit: "mg/dL",   lo: 0.1,  hi: 1.2 },
-  "Albumin":          { unit: "g/dL",    lo: 3.5,  hi: 5.0 },
-  "INR":              { unit: "",        lo: 0.8,  hi: 1.2 },
-  "Platelets":        { unit: "×10³/µL", lo: 150,  hi: 400 },
-  "Hemoglobin":       { unit: "g/dL",    lo: 12,   hi: 17.5 },
-  "Ferritin":         { unit: "ng/mL",   lo: 20,   hi: 250 },
-  "CRP":              { unit: "mg/L",    lo: 0,    hi: 5 },
-  "Fecal calprotectin": { unit: "µg/g",  lo: 0,    hi: 50 },
-  "Lipase":           { unit: "U/L",     lo: 0,    hi: 160 },
-  "Creatinine":       { unit: "mg/dL",   lo: 0.6,  hi: 1.2 },
-  "HbA1c":            { unit: "%",       lo: 4,    hi: 5.6 },
-  "HBV DNA":          { unit: "IU/mL",   lo: 0,    hi: 20 },
-  "HCV RNA":          { unit: "IU/mL",   lo: 0,    hi: 15 }
-};
+// Lab report catalog, grouped like a lab report.
+// Typical adult reference ranges — every lab differs, so ranges are editable
+// per result and the patient's last-used unit/range is remembered.
+// [name, unit, low, high]  — or [name, "", "", "", normalText] for qualitative tests.
+const CATALOG = [
+  ["Hematology — CBC", [
+    ["WBC", "×10³/µL", 4.0, 11.0], ["RBC", "×10⁶/µL", 4.2, 5.9], ["Hemoglobin", "g/dL", 12, 17.5],
+    ["Hematocrit", "%", 36, 52], ["MCV", "fL", 80, 100], ["MCH", "pg", 27, 33], ["MCHC", "g/dL", 32, 36],
+    ["RDW", "%", 11.5, 14.5], ["Platelets", "×10³/µL", 150, 400], ["MPV", "fL", 7.5, 11.5],
+    ["Neutrophils", "%", 40, 75], ["Lymphocytes", "%", 20, 45], ["Monocytes", "%", 2, 10],
+    ["Eosinophils", "%", 1, 6], ["Basophils", "%", 0, 1], ["Reticulocytes", "%", 0.5, 2.5], ["ESR", "mm/h", 0, 20]
+  ]],
+  ["Coagulation", [
+    ["PT", "s", 11, 13.5], ["INR", "", 0.8, 1.2], ["aPTT", "s", 25, 35], ["Fibrinogen", "mg/dL", 200, 400]
+  ]],
+  ["Liver function", [
+    ["ALT", "U/L", 7, 56], ["AST", "U/L", 10, 40], ["ALP", "U/L", 44, 147], ["GGT", "U/L", 9, 48],
+    ["Total bilirubin", "mg/dL", 0.1, 1.2], ["Direct bilirubin", "mg/dL", 0, 0.3], ["Albumin", "g/dL", 3.5, 5.0],
+    ["Total protein", "g/dL", 6.0, 8.3], ["LDH", "U/L", 140, 280]
+  ]],
+  ["Kidney & electrolytes", [
+    ["Urea (BUN)", "mg/dL", 7, 20], ["Creatinine", "mg/dL", 0.6, 1.2], ["eGFR", "mL/min/1.73m²", 90, ""],
+    ["Sodium", "mmol/L", 135, 145], ["Potassium", "mmol/L", 3.5, 5.1], ["Chloride", "mmol/L", 98, 107],
+    ["Bicarbonate", "mmol/L", 22, 29], ["Calcium", "mg/dL", 8.5, 10.5], ["Magnesium", "mg/dL", 1.7, 2.2],
+    ["Phosphorus", "mg/dL", 2.5, 4.5], ["Uric acid", "mg/dL", 3.5, 7.2]
+  ]],
+  ["Glucose & lipids", [
+    ["Fasting glucose", "mg/dL", 70, 100], ["HbA1c", "%", 4, 5.6], ["Total cholesterol", "mg/dL", "", 200],
+    ["LDL cholesterol", "mg/dL", "", 100], ["HDL cholesterol", "mg/dL", 40, ""], ["Triglycerides", "mg/dL", "", 150]
+  ]],
+  ["Iron & vitamins", [
+    ["Serum iron", "µg/dL", 60, 170], ["Ferritin", "ng/mL", 20, 250], ["TIBC", "µg/dL", 250, 450],
+    ["Transferrin saturation", "%", 20, 50], ["Vitamin B12", "pg/mL", 200, 900], ["Folate", "ng/mL", 2.7, 17],
+    ["Vitamin D (25-OH)", "ng/mL", 30, 100]
+  ]],
+  ["Inflammation & pancreas", [
+    ["CRP", "mg/L", "", 5], ["Lipase", "U/L", "", 160], ["Amylase", "U/L", 30, 110]
+  ]],
+  ["Thyroid", [
+    ["TSH", "mIU/L", 0.4, 4.0], ["Free T4", "ng/dL", 0.8, 1.8]
+  ]],
+  ["Hepatitis & infection", [
+    ["HBsAg", "", "", "", "Negative"], ["Anti-HBs", "mIU/mL", 10, ""], ["Anti-HBc (total)", "", "", "", "Negative"],
+    ["HBV DNA", "IU/mL", "", 20], ["Anti-HCV", "", "", "", "Negative"], ["HCV RNA", "IU/mL", "", 15],
+    ["H. pylori stool antigen", "", "", "", "Negative"], ["H. pylori breath test", "", "", "", "Negative"]
+  ]],
+  ["Stool tests", [
+    ["Fecal calprotectin", "µg/g", "", 50], ["Fecal occult blood (FIT)", "", "", "", "Negative"],
+    ["Stool culture", "", "", "", "Negative"], ["Stool ova & parasites", "", "", "", "Negative"]
+  ]],
+  ["Tumor markers", [
+    ["CEA", "ng/mL", "", 5], ["CA 19-9", "U/mL", "", 37], ["AFP", "ng/mL", "", 10]
+  ]],
+  ["Other", []]
+];
+const LABS = {};
+const labOrder = name => { const i = Object.keys(LABS).indexOf(name); return i < 0 ? 9999 : i; };
+CATALOG.forEach(([cat, tests]) => tests.forEach(([name, unit, lo, hi, text]) => { LABS[name] = { cat, unit, lo, hi, text: text || "" }; }));
 
 /* ---------------- tiny helpers ---------------- */
 const $ = (s, el = document) => el.querySelector(s);
@@ -58,7 +96,20 @@ const age = dob => { if (!dob) return ""; const b = parse(dob), n = new Date(); 
 const fullName = p => p ? `${p.firstName} ${p.lastName}`.trim() : "Unknown patient";
 const initials = p => p ? ((p.firstName[0] || "") + (p.lastName[0] || "")).toUpperCase() : "?";
 const relDays = s => { const n = daysBetween(today(), s); if (n === 0) return "today"; if (n === 1) return "tomorrow"; if (n === -1) return "yesterday"; return n > 0 ? `in ${n} days` : `${-n} days ago`; };
-const flag = l => (l.refLow !== "" && l.refLow != null && +l.value < +l.refLow) ? "lo" : (l.refHigh !== "" && l.refHigh != null && +l.value > +l.refHigh) ? "hi" : "n";
+const isNum = v => v !== "" && v != null && !isNaN(+v);
+const has = v => v !== "" && v != null;
+// n = normal, lo / hi = out of numeric range, ab = qualitative result differs from expected
+const flag = l => {
+  if (!has(l.value)) return "n";
+  if (l.normalText) return String(l.value).trim().toLowerCase() === String(l.normalText).trim().toLowerCase() ? "n" : "ab";
+  if (!isNum(l.value)) return "n";
+  if (has(l.refLow) && +l.value < +l.refLow) return "lo";
+  if (has(l.refHigh) && +l.value > +l.refHigh) return "hi";
+  return "n";
+};
+const arrow = f => f === "hi" ? " ↑" : f === "lo" ? " ↓" : f === "ab" ? " !" : "";
+const flagLabel = f => ({ n: "Normal", hi: "High", lo: "Low", ab: "Abnormal" }[f]);
+const rangeText = l => l.normalText ? `Normal: ${l.normalText}` : has(l.refLow) && has(l.refHigh) ? `${l.refLow}–${l.refHigh}` : has(l.refHigh) ? `< ${l.refHigh}` : has(l.refLow) ? `> ${l.refLow}` : "—";
 
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.classList.add("show"); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove("show"), 2200); }
 
@@ -82,7 +133,7 @@ async function open(env, pass) {
 }
 
 /* ---------------- store ---------------- */
-const empty = () => ({ patients: [], appointments: [], visits: [], labs: [], meds: [], procedures: [] });
+const empty = () => ({ patients: [], appointments: [], visits: [], labs: [], meds: [], procedures: [], customTests: [] });
 let DB = null, KEY = null, SALT = null;
 async function save() {
   try { localStorage.setItem(STORE_KEY, JSON.stringify(await seal(DB, KEY, SALT))); }
@@ -236,28 +287,21 @@ function editVisit(v, pid) {
     onDelete: isNew ? null : () => remove("visits", v.id)
   });
 }
-function editLab(l, pid, presetTest) {
-  const isNew = !l;
-  const t0 = presetTest && LABS[presetTest] ? presetTest : "ALT";
-  l = l || { id: uid(), patientId: pid, date: today(), test: t0, unit: LABS[t0].unit, refLow: LABS[t0].lo, refHigh: LABS[t0].hi };
+// Fix or delete one existing result (new results go through the lab report table).
+function editLab(l) {
   form({
-    title: isNew ? "Add lab result" : "Edit lab result", values: l,
+    title: `Edit ${l.test} · ${fmtDate(l.date)}`, values: l,
     fields: [
-      { name: "test", label: "Test", required: true, list: Object.keys(LABS), hint: "Pick from the list or type any test name" },
       { name: "date", label: "Date", type: "date", required: true },
-      { name: "value", label: "Result", type: "number", step: "any", required: true },
+      { name: "value", label: "Result", required: true },
       { name: "unit", label: "Unit" },
-      { name: "refLow", label: "Normal range – low", type: "number", step: "any" },
-      { name: "refHigh", label: "Normal range – high", type: "number", step: "any", hint: "Use the range on the lab's report" },
+      ...(l.normalText ? [{ name: "normalText", label: "Normal result" }] : [
+        { name: "refLow", label: "Normal range – low", type: "number", step: "any" },
+        { name: "refHigh", label: "Normal range – high", type: "number", step: "any" }]),
       { name: "comment", label: "Comment", full: true }
     ],
-    onInput: (e, frm) => {
-      if (e.target.name !== "test") return;
-      const c = LABS[e.target.value]; if (!c) return;
-      frm.elements.unit.value = c.unit; frm.elements.refLow.value = c.lo; frm.elements.refHigh.value = c.hi;
-    },
-    onSave: async d => { Object.assign(l, d, { value: +d.value }); await upsert("labs", l); toast(flag(l) === "n" ? "Result saved" : "Saved — result is out of range"); },
-    onDelete: isNew ? null : () => remove("labs", l.id)
+    onSave: async d => { Object.assign(l, d, { value: isNum(d.value) ? +d.value : d.value }); await upsert("labs", l); toast(flag(l) === "n" ? "Result saved" : "Saved — result is out of range"); },
+    onDelete: () => remove("labs", l.id)
   });
 }
 function editMed(m, pid) {
@@ -366,7 +410,7 @@ function viewDashboard() {
     <div class="col-side">
       <section class="card">
         <div class="card-title"><h2>Labs to review</h2></div>
-        <div class="list">${recentAbn.slice(0, 6).map(l => `<a class="item" href="#/patient/${l.patientId}/labs"><span class="who"><strong>${esc(fullName(patient(l.patientId)))}</strong><span>${esc(l.test)} · ${esc(fmtDate(l.date))}</span></span>${chip(`${l.value} ${l.unit} ${flag(l) === "hi" ? "↑" : "↓"}`, "bad")}</a>`).join("") || empt("No out-of-range results.")}</div>
+        <div class="list">${recentAbn.slice(0, 6).map(l => `<a class="item" href="#/patient/${l.patientId}/labs"><span class="who"><strong>${esc(fullName(patient(l.patientId)))}</strong><span>${esc(l.test)} · ${esc(fmtDate(l.date))}</span></span>${chip(`${l.value} ${l.unit || ""}${arrow(flag(l))}`, "bad")}</a>`).join("") || empt("No out-of-range results.")}</div>
       </section>
       <section class="card-blue">
         <h2 style="font-size:20px;font-weight:800">Follow-ups due</h2>
@@ -431,6 +475,7 @@ function viewPatient(id, tab = "overview") {
     <div class="chips">
       <button class="btn btn-white" data-act="edit-patient" data-id="${p.id}">Edit details</button>
       <button class="btn btn-white" data-act="print">Print</button>
+      <a class="btn btn-white" href="#/patient/${p.id}/labentry" data-act="lab-entry" data-id="${p.id}">Lab report</a>
       <button class="btn btn-dark" data-act="new-visit" data-id="${p.id}">${plusIcon}Visit note</button>
     </div>
   </section>
@@ -456,16 +501,18 @@ function viewPatient(id, tab = "overview") {
   labs.forEach(l => (groups[l.test] = groups[l.test] || []).push(l));
   const labCard = (test, rows) => {
     const last = rows[rows.length - 1], f = flag(last), prev = rows[rows.length - 2];
-    const delta = prev ? Math.round((last.value - prev.value) * 100) / 100 : null;
+    const numeric = rows.filter(r => isNum(r.value));
+    const delta = prev && isNum(last.value) && isNum(prev.value) ? Math.round((last.value - prev.value) * 100) / 100 : null;
+    const trend = prev ? (delta == null ? `Previous: ${prev.value} on ${fmtDate(prev.date)}` : `${delta > 0 ? "↑" : delta < 0 ? "↓" : "="} ${Math.abs(delta)} since ${fmtDate(prev.date)}`) : "First result";
     return `<div class="lab-card">
-      <div class="top"><div><h3>${esc(test)}</h3><span class="tiny muted">Normal ${esc(last.refLow ?? "")}–${esc(last.refHigh ?? "")} ${esc(last.unit)}</span></div>
-        <div style="text-align:right"><div class="latest">${esc(last.value)} <small>${esc(last.unit)}</small></div>
-        ${chip(f === "n" ? "Normal" : f === "hi" ? "High" : "Low", f === "n" ? "ok" : "bad")}</div></div>
-      ${sparkSVG(rows)}
+      <div class="top"><div><h3>${esc(test)}</h3><span class="tiny muted">${last.normalText ? esc(rangeText(last)) : `Normal ${esc(rangeText(last))} ${esc(last.unit)}`}</span></div>
+        <div style="text-align:right"><div class="latest">${esc(last.value)} <small>${esc(last.unit || "")}</small></div>
+        ${chip(flagLabel(f), f === "n" ? "ok" : "bad")}</div></div>
+      ${!last.normalText && numeric.length ? sparkSVG(numeric) : ""}
       <div class="vals">${rows.slice().reverse().map(r => `<button type="button" data-act="edit-lab" data-id="${r.id}" aria-label="Edit ${esc(test)} on ${esc(fmtDate(r.date))}"><b class="${flag(r)}">${esc(r.value)}</b><span>${esc(fmtShort(r.date))}</span></button>`).join("")}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
-        <span class="small muted" style="font-weight:600">${delta == null ? "First result" : `${delta > 0 ? "↑" : delta < 0 ? "↓" : "="} ${Math.abs(delta)} since ${fmtDate(prev.date)}`}</span>
-        <button class="btn btn-soft btn-sm" data-act="add-lab" data-id="${p.id}" data-test="${esc(test)}">${plusIcon}Add</button></div>
+        <span class="small muted" style="font-weight:600">${esc(trend)}</span>
+        <a class="btn btn-soft btn-sm" href="#/patient/${p.id}/labentry" data-act="lab-entry" data-id="${p.id}" data-test="${esc(test)}">${plusIcon}Add</a></div>
     </div>`;
   };
 
@@ -505,23 +552,181 @@ function viewPatient(id, tab = "overview") {
           ${meds.filter(m => m.active === "yes").map(m => `<div class="kv"><span>${esc(m.name)}</span><span>${esc([m.dose, m.frequency].filter(Boolean).join(" · "))}</span></div>`).join("") || empt("None active.")}</section>
       </div>
     </div>
-    <section class="card"><div class="card-title"><h2>Latest blood tests</h2><a href="#/patient/${p.id}/labs" class="small" style="font-weight:700;text-decoration:none">See trends</a></div>
-      <div class="chips">${latestPerTest.map(l => chip(`${l.test}: ${l.value} ${l.unit}${flag(l) === "hi" ? " ↑" : flag(l) === "lo" ? " ↓" : ""} · ${fmtShort(l.date)}`, flag(l) === "n" ? "ok" : "bad")).join("") || `<span class="muted small">No results yet.</span>`}</div></section>
+    <section class="card"><div class="card-title"><h2>Latest blood tests</h2><span class="chips"><a href="#/patient/${p.id}/labs" class="btn btn-soft btn-sm">See trends</a><a href="#/patient/${p.id}/labentry" data-act="lab-entry" data-id="${p.id}" class="btn btn-blue btn-sm">${plusIcon}Enter lab report</a></span></div>
+      <div class="chips">${latestPerTest.map(l => chip(`${l.test}: ${l.value} ${l.unit || ""}${arrow(flag(l))} · ${fmtShort(l.date)}`, flag(l) === "n" ? "ok" : "bad")).join("") || `<span class="muted small">No results yet.</span>`}</div></section>
     <section class="card"><div class="card-title"><h2>Last visit</h2><a href="#/patient/${p.id}/visits" class="small" style="font-weight:700;text-decoration:none">All visits</a></div>
       ${visits[0] ? visitHTML(visits[0]) : empt("No visits recorded yet.")}</section>
     ${procs[0] ? `<section class="card"><div class="card-title"><h2>Last procedure</h2></div>${procHTML(procs[0])}</section>` : ""}`;
   }
   if (tab === "visits") body = `<section class="card"><div class="card-title"><h2>Visit history</h2><button class="btn btn-blue" data-act="new-visit" data-id="${p.id}">${plusIcon}New note</button></div>
       <div class="list">${visits.map(visitHTML).join("") || empt("No visits recorded yet.")}</div></section>`;
-  if (tab === "labs") body = `<section class="card"><div class="card-title"><div><h2>Blood tests over time</h2><p class="small muted">Green band = normal range from the lab report. Red points are out of range. Tap a value to edit it.</p></div>
-      <button class="btn btn-blue" data-act="add-lab" data-id="${p.id}">${plusIcon}Add result</button></div>
-      ${Object.keys(groups).length ? `<div class="lab-grid">${Object.entries(groups).map(([k, r]) => labCard(k, r)).join("")}</div>` : empt("No lab results yet.")}</section>`;
+  if (tab === "labs") body = `<section class="card"><div class="card-title"><div><h2>Blood tests over time</h2><p class="small muted">Green band = normal range from the lab report. Red points are out of range. Tap a value to fix or delete it.</p></div>
+      <a class="btn btn-blue" href="#/patient/${p.id}/labentry" data-act="lab-entry" data-id="${p.id}">${plusIcon}Enter lab report</a></div>
+      ${Object.keys(groups).length ? `<div class="lab-grid">${Object.entries(groups).sort((a, b) => labOrder(a[0]) - labOrder(b[0])).map(([k, r]) => labCard(k, r)).join("")}</div>` : empt("No lab results yet.")}</section>`;
   if (tab === "meds") body = `<section class="card"><div class="card-title"><h2>Medications</h2><button class="btn btn-blue" data-act="add-med" data-id="${p.id}">${plusIcon}Add medication</button></div>${medsTable(meds)}</section>`;
   if (tab === "procedures") body = `<section class="card"><div class="card-title"><h2>Procedures &amp; endoscopy</h2><button class="btn btn-blue" data-act="add-proc" data-id="${p.id}">${plusIcon}Add procedure</button></div>
       <div class="list">${procs.map(procHTML).join("") || empt("No procedures recorded.")}</div></section>`;
   if (tab === "appointments") body = `<section class="card"><div class="card-title"><h2>Appointments</h2><button class="btn btn-blue" data-act="new-appt" data-id="${p.id}">${plusIcon}Book</button></div>
       <div class="list">${appts.map(a => apptItem(a, true)).join("") || empt("No appointments.")}</div></section>`;
   return header + body;
+}
+
+
+/* ---------------- lab report entry ---------------- */
+// One draft per patient survives navigation until saved or discarded.
+const LE = {};               // pid -> { date, labName, draft: {test: {value, unit, refLow, refHigh, normalText, pre}}, focus, q, onlyPrev }
+function leState(pid) {
+  if (!LE[pid]) { LE[pid] = { date: today(), labName: "", draft: {}, q: "", onlyPrev: false, focus: null }; lePrefill(pid); }
+  return LE[pid];
+}
+// Tests shown, per category: catalog + doctor's custom tests + anything in this patient's history.
+function leTests() {
+  const cats = CATALOG.map(([cat, tests]) => ({ cat, tests: tests.map(t => t[0]) }));
+  const byCat = Object.fromEntries(cats.map(c => [c.cat, c]));
+  (DB.customTests || []).forEach(t => { const c = byCat[t.cat] || byCat.Other; if (!c.tests.includes(t.name)) c.tests.push(t.name); });
+  const known = new Set(cats.flatMap(c => c.tests));
+  DB.labs.forEach(l => { if (!known.has(l.test)) { byCat.Other.tests.push(l.test); known.add(l.test); } });
+  return cats;
+}
+// Defaults for a row: patient's last result for that test (keeps that lab's range), else custom test, else catalog.
+function leDefaults(pid, test) {
+  const last = byPatient("labs", pid).filter(l => l.test === test).sort((a, b) => a.date.localeCompare(b.date)).pop();
+  if (last) return { unit: last.unit || "", refLow: last.refLow ?? "", refHigh: last.refHigh ?? "", normalText: last.normalText || "" };
+  const c = (DB.customTests || []).find(t => t.name === test) || LABS[test];
+  if (c) return { unit: c.unit || "", refLow: c.lo ?? c.refLow ?? "", refHigh: c.hi ?? c.refHigh ?? "", normalText: c.text || c.normalText || "" };
+  return { unit: "", refLow: "", refHigh: "", normalText: "" };
+}
+function lePrevious(pid, test, date) {
+  return byPatient("labs", pid).filter(l => l.test === test && l.date < date).sort((a, b) => a.date.localeCompare(b.date)).pop();
+}
+// Load results already saved for the report date, so a report can be finished later.
+function lePrefill(pid) {
+  const st = LE[pid];
+  Object.keys(st.draft).forEach(k => { if (st.draft[k].pre && !st.draft[k].touched) delete st.draft[k]; });
+  byPatient("labs", pid).filter(l => l.date === st.date).forEach(l => {
+    if (st.draft[l.test] && st.draft[l.test].touched) return;
+    st.draft[l.test] = { value: String(l.value), unit: l.unit || "", refLow: l.refLow ?? "", refHigh: l.refHigh ?? "", normalText: l.normalText || "", pre: l.id };
+    if (l.labName) st.labName = st.labName || l.labName;
+  });
+}
+const leRow = (pid, test, st) => {
+  const d = st.draft[test] || { value: "", ...leDefaults(pid, test) };
+  const prev = lePrevious(pid, test, st.date);
+  const f = flag(d), text = !!d.normalText;
+  return `<tr data-test="${esc(test)}" class="le-row ${has(d.value) ? "filled" : ""} f-${f}" ${prev ? 'data-prev="1"' : ""}>
+    <th scope="row" class="le-name">${esc(test)}</th>
+    <td class="le-prev">${prev ? `<b class="${flag(prev)}">${esc(prev.value)}</b> <span>${esc(prev.unit || "")}</span><small>${esc(fmtDate(prev.date))}</small>` : `<span class="muted">—</span>`}</td>
+    <td><input class="le-in le-res" data-k="value" value="${esc(d.value)}" ${text ? `list="le-qual" placeholder="${esc(d.normalText)}"` : 'inputmode="decimal"'} aria-label="${esc(test)} result" autocomplete="off"></td>
+    <td><input class="le-in le-sm" data-k="unit" value="${esc(d.unit)}" aria-label="${esc(test)} unit"></td>
+    ${text ? `<td colspan="2"><input class="le-in" data-k="normalText" value="${esc(d.normalText)}" aria-label="${esc(test)} normal result"></td>`
+           : `<td><input class="le-in le-sm" data-k="refLow" value="${esc(d.refLow)}" inputmode="decimal" aria-label="${esc(test)} normal low"></td>
+              <td><input class="le-in le-sm" data-k="refHigh" value="${esc(d.refHigh)}" inputmode="decimal" aria-label="${esc(test)} normal high"></td>`}
+    <td class="le-flag">${has(d.value) ? chip(flagLabel(f), f === "n" ? "ok" : "bad") : ""}</td>
+  </tr>`;
+};
+function leCounts(st) {
+  const filled = Object.values(st.draft).filter(d => has(d.value));
+  return { n: filled.length, bad: filled.filter(d => flag(d) !== "n").length };
+}
+function viewLabEntry(pid) {
+  const p = patient(pid);
+  if (!p) return `<div class="card">${empt("Patient not found.")}</div>`;
+  const st = leState(pid), c = leCounts(st);
+  const cats = leTests();
+  const hasPrev = t => byPatient("labs", pid).some(l => l.test === t);
+  return `
+  <a href="#/patient/${pid}/labs" class="small" style="font-weight:700;text-decoration:none;padding:6px 4px">← Back to ${esc(fullName(p))}</a>
+  <section class="p-head" style="padding:22px 24px">
+    <div class="p-id"><span class="avatar xl" style="width:64px;height:64px;font-size:22px">${esc(initials(p))}</span>
+      <div><h1 style="font-size:28px">New lab report</h1><span class="meta">${esc(fullName(p))}${p.dob ? ` · ${age(p.dob)} years` : ""}</span></div></div>
+    <div class="le-meta">
+      <label class="fld">Report date<input type="date" id="le-date" value="${esc(st.date)}" required></label>
+      <label class="fld">Laboratory<input id="le-lab" value="${esc(st.labName)}" placeholder="e.g. hospital lab" list="le-labs"></label>
+    </div>
+  </section>
+  <datalist id="le-qual"><option value="Negative"><option value="Positive"><option value="Not detected"><option value="Detected"></datalist>
+  <datalist id="le-labs">${[...new Set(DB.labs.map(l => l.labName).filter(Boolean))].map(n => `<option value="${esc(n)}">`).join("")}</datalist>
+  <section class="card le-card">
+    <div class="le-tools">
+      <label class="search" style="flex:1 1 260px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A5B74" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+        <input id="le-q" type="search" placeholder="Find a test… e.g. ALT, ferritin" value="${esc(st.q)}" aria-label="Find a test"></label>
+      <div class="seg" role="group" aria-label="Which tests to show">
+        <button type="button" data-act="le-only" data-v="0" aria-pressed="${!st.onlyPrev}">All tests</button>
+        <button type="button" data-act="le-only" data-v="1" aria-pressed="${st.onlyPrev}">Done before</button>
+      </div>
+      <div class="chips"><button type="button" class="btn btn-soft btn-sm" data-act="le-fold" data-v="1">Expand all</button><button type="button" class="btn btn-soft btn-sm" data-act="le-fold" data-v="0">Collapse all</button></div>
+    </div>
+    <p class="small muted">Type results only for the tests on this report — empty rows are ignored. Units and normal ranges come from this patient's last report (or typical values) and can be changed. Press <kbd>Enter</kbd> to jump to the next result.</p>
+    ${cats.map(({ cat, tests }) => {
+      const nIn = tests.filter(t => st.draft[t] && has(st.draft[t].value)).length;
+      const open = nIn > 0 || tests.some(hasPrev) || (st.focus && tests.includes(st.focus));
+      return `<details class="le-cat" data-cat="${esc(cat)}" ${open ? "open" : ""}>
+        <summary><span class="le-cat-name">${esc(cat)}</span><span class="chip ${nIn ? "blue" : ""} le-cat-count">${nIn ? nIn + " entered" : tests.length + " tests"}</span></summary>
+        <div class="tbl-wrap"><table class="le-table">
+          <thead><tr><th scope="col">Test</th><th scope="col">Previous result</th><th scope="col">Result</th><th scope="col">Unit</th><th scope="col">Normal low</th><th scope="col">Normal high</th><th scope="col"><span class="sr">Flag</span></th></tr></thead>
+          <tbody>${tests.map(t => leRow(pid, t, st)).join("")}</tbody>
+        </table></div>
+        <button type="button" class="btn btn-soft btn-sm le-add" data-act="le-add" data-cat="${esc(cat)}">${plusIcon}Add a test to ${esc(cat)}</button>
+      </details>`; }).join("")}
+  </section>
+  <div class="le-bar">
+    <span id="le-count"><strong>${c.n}</strong> result${c.n === 1 ? "" : "s"} entered${c.bad ? ` · <span class="bad-txt">${c.bad} out of range</span>` : ""}</span>
+    <span class="grow"></span>
+    <button type="button" class="btn btn-white" data-act="le-discard" data-id="${pid}">Discard</button>
+    <button type="button" class="btn btn-blue" data-act="le-save" data-id="${pid}">Save report</button>
+  </div>`;
+}
+function leAfterRender(pid) {
+  const st = LE[pid]; if (!st) return;
+  leFilter(st);
+  if (st.focus) {
+    const row = $(`.le-row[data-test="${CSS.escape(st.focus)}"]`);
+    if (row) { row.closest("details").open = true; row.scrollIntoView({ block: "center" }); row.querySelector(".le-res").focus(); row.classList.add("hl"); }
+    st.focus = null;
+  }
+}
+function leFilter(st) {
+  const q = (st.q || "").toLowerCase();
+  $$(".le-cat").forEach(cat => {
+    let any = 0;
+    $$(".le-row", cat).forEach(r => {
+      const show = (!q || r.dataset.test.toLowerCase().includes(q) || cat.dataset.cat.toLowerCase().includes(q)) && (!st.onlyPrev || r.dataset.prev || r.classList.contains("filled"));
+      r.hidden = !show; if (show) any++;
+    });
+    cat.hidden = !any && (q || st.onlyPrev);
+    if (q && any) cat.open = true;
+  });
+}
+function leUpdateRow(pid, row) {
+  const st = LE[pid], test = row.dataset.test;
+  const d = st.draft[test] || (st.draft[test] = { value: "", ...leDefaults(pid, test) });
+  $$(".le-in", row).forEach(i => d[i.dataset.k] = i.value.trim());
+  d.touched = true;
+  const f = flag(d);
+  row.className = `le-row ${has(d.value) ? "filled" : ""} f-${f}`;
+  row.querySelector(".le-flag").innerHTML = has(d.value) ? chip(flagLabel(f), f === "n" ? "ok" : "bad") : "";
+  const cat = row.closest(".le-cat"), nIn = $$(".le-row.filled", cat).length, cc = cat.querySelector(".le-cat-count");
+  cc.textContent = nIn ? nIn + " entered" : $$(".le-row", cat).length + " tests"; cc.classList.toggle("blue", !!nIn);
+  const c = leCounts(st);
+  $("#le-count").innerHTML = `<strong>${c.n}</strong> result${c.n === 1 ? "" : "s"} entered${c.bad ? ` · <span class="bad-txt">${c.bad} out of range</span>` : ""}`;
+}
+async function leSave(pid) {
+  const st = LE[pid];
+  if (!st.date) { toast("Choose the report date"); return; }
+  let added = 0, updated = 0, removed = 0, bad = 0;
+  for (const [test, d] of Object.entries(st.draft)) {
+    const existing = d.pre ? find("labs", d.pre) : DB.labs.find(l => l.patientId === pid && l.test === test && l.date === st.date);
+    if (!has(d.value)) { if (existing && d.pre) { DB.labs = DB.labs.filter(l => l.id !== existing.id); removed++; } continue; }
+    const rec = existing || { id: uid(), patientId: pid, test };
+    Object.assign(rec, { date: st.date, labName: st.labName, value: isNum(d.value) ? +d.value : d.value, unit: d.unit, refLow: d.normalText ? "" : (isNum(d.refLow) ? +d.refLow : ""), refHigh: d.normalText ? "" : (isNum(d.refHigh) ? +d.refHigh : ""), normalText: d.normalText || "" });
+    if (existing) updated++; else { DB.labs.push(rec); added++; }
+    if (flag(rec) !== "n") bad++;
+  }
+  if (!added && !updated && !removed) { toast("Nothing entered yet"); return; }
+  await save();
+  delete LE[pid];
+  location.hash = `#/patient/${pid}/labs`;
+  toast(`Saved ${added + updated} result${added + updated === 1 ? "" : "s"}${bad ? ` · ${bad} out of range` : ""}`);
 }
 
 let calDay = null;
@@ -584,6 +789,7 @@ function route() {
   const [page, id, tab] = parts;
   let html, nav = "dash";
   if (page === "patients") { html = viewPatients(route.q || ""); nav = "patients"; }
+  else if (page === "patient" && tab === "labentry") { html = viewLabEntry(id); nav = "patients"; }
   else if (page === "patient") { html = viewPatient(id, tab || "overview"); nav = "patients"; }
   else if (page === "appointments") { html = viewAppointments(); nav = "appointments"; }
   else if (page === "settings") { html = viewSettings(); nav = "settings"; }
@@ -594,6 +800,13 @@ function route() {
   $$(".side-nav a").forEach(a => a.dataset.nav === nav ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   const s = $("#psearch");
   if (s) { s.oninput = () => { route.q = s.value; route(); }; if (keepSearch) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); } }
+  if (page === "patient" && tab === "labentry" && LE[id]) {
+    const st = LE[id];
+    $("#le-date").onchange = e => { if (!e.target.value) return; st.date = e.target.value; lePrefill(id); route(); };
+    $("#le-lab").oninput = e => { st.labName = e.target.value; };
+    $("#le-q").oninput = e => { st.q = e.target.value; leFilter(st); };
+    leAfterRender(id);
+  }
   const cd = $("#cal-date"); if (cd) cd.onchange = () => { if (cd.value) { calDay = cd.value; route(); } };
 }
 addEventListener("hashchange", () => { route(); window.scrollTo(0, 0); });
@@ -607,8 +820,19 @@ const ACTIONS = {
   "edit-appt": el => editAppointment(find("appointments", el.dataset.id)),
   "new-visit": el => editVisit(null, el.dataset.id),
   "edit-visit": el => editVisit(find("visits", el.dataset.id)),
-  "add-lab": el => editLab(null, el.dataset.id, el.dataset.test),
   "edit-lab": el => editLab(find("labs", el.dataset.id)),
+  "lab-entry": el => { const st = leState(el.dataset.id); if (el.dataset.test) st.focus = el.dataset.test; const h = `#/patient/${el.dataset.id}/labentry`; if (location.hash === h) route(); else location.hash = h; },
+  "le-only": el => { const pid = location.hash.split("/")[2], st = LE[pid]; st.onlyPrev = el.dataset.v === "1"; $$("[data-act=le-only]").forEach(b => b.setAttribute("aria-pressed", String(b === el))); leFilter(st); },
+  "le-fold": el => $$(".le-cat").forEach(d => { if (!d.hidden) d.open = el.dataset.v === "1"; }),
+  "le-add": async el => {
+    const pid = location.hash.split("/")[2], st = LE[pid], cat = el.dataset.cat;
+    const name = (prompt(`Name of the new test in ${cat}:`) || "").trim(); if (!name) return;
+    const exists = Object.keys(LABS).concat((DB.customTests || []).map(t => t.name)).find(n => n.toLowerCase() === name.toLowerCase());
+    if (!exists) { DB.customTests = DB.customTests || []; DB.customTests.push({ cat, name, unit: "", refLow: "", refHigh: "" }); await save(); toast(`${name} added — it will appear for every patient`); }
+    st.focus = exists || name; route();
+  },
+  "le-discard": el => { const pid = el.dataset.id; if (leCounts(LE[pid]).n && !confirm("Discard the results typed on this report?")) return; delete LE[pid]; location.hash = `#/patient/${pid}/labs`; },
+  "le-save": el => leSave(el.dataset.id),
   "add-med": el => editMed(null, el.dataset.id),
   "edit-med": el => editMed(find("meds", el.dataset.id)),
   "stop-med": async el => { const m = find("meds", el.dataset.id); if (!confirm(`Stop ${m.name} today?`)) return; m.active = "no"; m.end = today(); await save(); route(); toast("Medication stopped"); },
@@ -658,6 +882,16 @@ document.addEventListener("click", e => {
   const row = e.target.closest("tr[data-go]");
   if (row && !e.target.closest("a,button,select")) location.hash = row.dataset.go;
 });
+document.addEventListener("input", e => {
+  const inp = e.target.closest(".le-in"); if (!inp || !DB) return;
+  leUpdateRow(location.hash.split("/")[2], inp.closest(".le-row"));
+});
+document.addEventListener("keydown", e => {
+  const inp = e.target.closest(".le-res"); if (!inp || e.key !== "Enter") return;
+  e.preventDefault();
+  const all = $$(".le-res").filter(i => !i.closest("tr").hidden && i.closest("details").open);
+  const nx = all[all.indexOf(inp) + (e.shiftKey ? -1 : 1)]; if (nx) { nx.focus(); nx.select(); }
+});
 document.addEventListener("change", async e => {
   const s = e.target.closest("select[data-status]"); if (!s || !DB) return;
   const a = find("appointments", s.dataset.status); a.status = s.value; await save(); toast("Status: " + statusMeta(a.status)[1]); route();
@@ -669,12 +903,12 @@ function loadDemo() {
   const mk = (firstName, lastName, sex, dob, extra) => { const p = { id: uid(), firstName, lastName, sex, dob, createdAt: addMonths(t, -18), ...extra }; P.push(p); DB.patients.push(p); return p.id; };
   const ap = (patientId, d, time, reason, location, status = "scheduled") => DB.appointments.push({ id: uid(), patientId, date: d, time, reason, location, status });
   const vi = (patientId, date, reason, discussion, findings, plan, type = "In clinic") => DB.visits.push({ id: uid(), patientId, date, type, reason, discussion, findings, plan });
-  const lab = (patientId, test, pairs) => pairs.forEach(([mAgo, v]) => DB.labs.push({ id: uid(), patientId, date: addMonths(t, -mAgo), test, value: v, unit: LABS[test].unit, refLow: LABS[test].lo, refHigh: LABS[test].hi }));
+  const lab = (patientId, test, pairs) => pairs.forEach(([mAgo, v]) => DB.labs.push({ id: uid(), patientId, date: addMonths(t, -mAgo), test, value: v, unit: LABS[test].unit, refLow: LABS[test].lo, refHigh: LABS[test].hi, normalText: LABS[test].text, labName: "Hospital lab" }));
   const med = (patientId, name, dose, frequency, indication, start, active = "yes", end = "") => DB.meds.push({ id: uid(), patientId, name, dose, frequency, indication, start, active, end });
   const proc = (patientId, type, date, hospital, indication, findings, biopsy, followUp) => DB.procedures.push({ id: uid(), patientId, type, date, hospital, indication, findings, biopsy, followUp });
 
   const a = mk("Layla", "Haddad", "Female", "1972-03-14", { phone: "+961 3 000 001", address: "Bikfaya", bloodType: "A+", allergies: "Penicillin", conditions: "Fatty liver (MASLD), GERD", insurance: "NSSF", emergency: "Sami Haddad (husband)", notes: "Non-smoker. Occasional alcohol. Mother had gallstones." });
-  lab(a, "ALT", [[12, 78], [8, 64], [4, 52], [0, 41]]); lab(a, "AST", [[12, 52], [8, 46], [4, 38], [0, 33]]); lab(a, "GGT", [[12, 71], [4, 55], [0, 44]]);
+  lab(a, "ALT", [[12, 78], [8, 64], [4, 52], [0, 41]]); lab(a, "H. pylori stool antigen", [[14, "Negative"]]); lab(a, "AST", [[12, 52], [8, 46], [4, 38], [0, 33]]); lab(a, "GGT", [[12, 71], [4, 55], [0, 44]]);
   med(a, "Pantoprazole", "40 mg", "once daily before breakfast", "GERD", addMonths(t, -14));
   med(a, "Omeprazole", "20 mg", "once daily", "GERD", addMonths(t, -30), "no", addMonths(t, -14));
   proc(a, "Gastroscopy", addMonths(t, -14), "Abou Jaoude Hospital", "Persistent heartburn", "LA grade A oesophagitis, small hiatal hernia.", "Antral biopsies: H. pylori negative.", "");
@@ -713,6 +947,10 @@ function loadDemo() {
 
   const f = mk("Georges", "Aoun", "Male", "1953-09-12", { phone: "+961 3 000 006", address: "Antelias", bloodType: "AB+", allergies: "Aspirin", conditions: "Iron-deficiency anaemia, Atrial fibrillation", insurance: "Army", emergency: "Joanna Aoun (daughter)" });
   lab(f, "Hemoglobin", [[5, 9.8], [3, 10.9], [1, 11.8], [0, 12.4]]); lab(f, "Ferritin", [[5, 8], [3, 15], [0, 46]]);
+  lab(f, "WBC", [[5, 7.1], [1, 6.8]]); lab(f, "RBC", [[5, 3.6], [1, 4.1]]); lab(f, "Hematocrit", [[5, 31], [1, 36.5]]);
+  lab(f, "MCV", [[5, 72], [1, 79]]); lab(f, "MCH", [[5, 24], [1, 26.5]]); lab(f, "RDW", [[5, 17.2], [1, 15.1]]); lab(f, "Platelets", [[5, 388], [1, 301]]);
+  lab(f, "Serum iron", [[5, 31], [0, 72]]); lab(f, "Transferrin saturation", [[5, 7], [0, 22]]);
+  lab(f, "Fecal occult blood (FIT)", [[5, "Positive"], [1, "Negative"]]);
   med(f, "Ferrous sulfate", "325 mg", "once daily", "Iron deficiency", addMonths(t, -5));
   med(f, "Apixaban", "5 mg", "twice daily (cardiologist)", "Atrial fibrillation", addMonths(t, -30));
   proc(f, "Gastroscopy + colonoscopy", addMonths(t, -5), "Abou Jaoude Hospital", "Iron-deficiency anaemia", "Gastric angiodysplasia treated with argon plasma; colon normal.", "", "");

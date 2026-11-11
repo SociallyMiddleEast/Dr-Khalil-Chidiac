@@ -63,6 +63,16 @@ Where the public details came from: his Instagram (@dr.khalilchidiac), his trakM
 - **Other computers:** a second computer, e.g. the Antelias clinic, will start empty. Restore a backup there to move data across.
 - **Try it out:** **Backup & settings → Load sample patients** adds six fictional patients. Use **Delete all data** before entering real patients.
 
+### Entering lab results
+
+Open a patient, then **Lab report**. Tests are grouped by category: Hematology (CBC), Coagulation, Liver, Kidney & electrolytes, Glucose & lipids, Iron & vitamins, Inflammation & pancreas, Thyroid, Hepatitis & infection, Stool tests, and Tumor markers.
+
+- **Typing results:** type only the results on the paper report and press **Enter** to jump to the next test. Out-of-range values turn red as you type.
+- **Previous results:** each row shows the patient's previous result and its date.
+- **Units and ranges:** these are copied from the patient's last report and can be edited.
+- **New tests:** use **Add a test to …** to create one. It's remembered for every patient.
+- **Finishing later:** reopening the report on the same date reloads what was already saved.
+
 ### Limits of this version
 
 This is a single-user, single-device tool. It has no syncing between clinics, no secretary accounts and no audit log.
